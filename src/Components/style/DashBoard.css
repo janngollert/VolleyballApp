@@ -1,0 +1,60 @@
+
+.dashboard {
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f7f9fb;
+  min-height: 100vh;
+}
+
+.welcome-section h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.next-training h3,
+.next-training a {
+  font-size: 1.2rem;
+  color: #2980b9;
+  text-decoration: none;
+}
+
+.dashboard-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.dashboard-tile {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  flex: 1 1 250px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s ease;
+}
+
+.dashboard-tile:hover {
+  transform: translateY(-5px);
+}
+
+.dashboard-tile img {
+  width: 60px;
+  height: 60px;
+  margin-bottom: 1rem;
+}
+
+.dashboard-tile a {
+  display: block;
+  font-weight: bold;
+  color: #34495e;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.dashboard-tile a:hover {
+  color: #1abc9c;
+}
