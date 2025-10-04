@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import "./style/MatchDocumentation.css"
 export const MatchDocumentation = () => {
 
     const [matchData, setMatchData] = useState(null)
@@ -14,7 +15,7 @@ export const MatchDocumentation = () => {
         middle1:"",
         middle2:"",
         libero:"",
-        
+        isCurrentlyServing: false,
         numberOfBenchPlayers: 0,
         benchPlayers: [],
     })
@@ -30,26 +31,38 @@ export const MatchDocumentation = () => {
         libero:"",
         numberOfBenchPlayers: 0,
         benchPlayers: [],
+        isCurrentlyServing: false,
     })
     const[numberOfSets, setNumberOfSets] = useState(3)
+    const [showWonSetScore, setShowWonSetScore] = useState(false)
+    const [showLostSetScore, setShowLostSetScore] = useState(false)
     
 
     const positions = ["Opposite", "Middle1", "Outside1", "Setter", "Middle2", "Outside2"]
     const positionsLibero = ["Opposite", "Middle1", "Outside1", "Setter", "Libero", "Outside2", "Middle2"]
 
     useEffect(() => {
-        setInterval(() => fetch("http://localhost:8080/matchData", {
-            credentials: "include"
-        }).then((res) => res.json()).then((data) => setMatchData(data)).catch(err => console.log(err)), 3000)
+        const interval = setInterval(() => {
+            fetch("http://localhost:8080/matchData", {
+                credentials: "include"
+            }).then((res) => res.json()).then((data) => setMatchData(data)).catch(err => console.log(err))
+        }, 3000)
 
 
-       fetch("http://localhost:8080/homeTeamData", {credentials: "include"}).then((res) => res.json(),).then((d) => setTeamData(d)).then(() => setYourTeam((prev) => {
-        return{
-            name: teamData.teamName,
-            ...prev,
-        }
-       })).catch(err => console.log(err))
+       fetch("http://localhost:8080/homeTeamData", {credentials: "include"})
+           .then((res) => res.json())
+           .then((d) => {
+               setTeamData(d)
+               setYourTeam((prev) => {
+                   return{
+                       name: d.teamName,
+                       ...prev,
+                   }
+               })
+           })
+           .catch(err => console.log(err))
      
+        return () => clearInterval(interval)
     }, [])
 
 
@@ -58,17 +71,12 @@ export const MatchDocumentation = () => {
 
     const increaseScore = (e, team) => {
         
-        const newMatchData = matchData
-        newMatchData.team.score += 1
-        setMatchData((prev) => {
-            return{
-                ...prev,
-                team: {
-                    ...prev.team,
-                    score: prev.team.score + 1,
-                },
-            }
-        })
+        const newMatchData = {...matchData}
+        const teamKey = team.name === matchData.team1.name ? 'team1' : 'team2'
+        newMatchData[teamKey] = {...newMatchData[teamKey], score: newMatchData[teamKey].score + 1}
+        
+        setMatchData(newMatchData)
+        
         fetch("http://localhost:8080/matchData", {
             method: "PUT",
             credentials: "include",
@@ -87,17 +95,12 @@ export const MatchDocumentation = () => {
 
     const decreaseScore = (e, team) => {
         
-        const newMatchData = matchData
-        newMatchData.team.score -= 1
-        setMatchData((prev) => {
-            return{
-                ...prev,
-                team: {
-                    ...prev.team,
-                    score: prev.team.score - 1,
-                },
-            }
-        })
+        const newMatchData = {...matchData}
+        const teamKey = team.name === matchData.team1.name ? 'team1' : 'team2'
+        newMatchData[teamKey] = {...newMatchData[teamKey], score: Math.max(0, newMatchData[teamKey].score - 1)}
+        
+        setMatchData(newMatchData)
+        
         fetch("http://localhost:8080/matchData", {
             method: "PUT",
             credentials: "include",
@@ -203,24 +206,27 @@ export const MatchDocumentation = () => {
         })
     }
 
+
+
     return (
         <>
 
-        <header>
+        <header className="md-header">
         <h1>Match Documentation</h1>
         </header>
-
-        <main>
+        
+        <div>
+        <main className="md-main">
         { !matchData  ? <div>
-            <h2>No current Match</h2>
+            <h2 className="md-no-match-title">No current Match</h2>
             <div>
-                <button onClick={() => setStartMatchDocumentationButtonIsClicked(!startMatchDocumentationButtonIsClicked)}>{startMatchDocumentationButtonIsClicked ? "Stop Match Documentation" : "Start Match Documentation"}</button>
+                <button className="md-button" onClick={() => setStartMatchDocumentationButtonIsClicked(!startMatchDocumentationButtonIsClicked)}>{startMatchDocumentationButtonIsClicked ? "Stop Match Documentation" : "Start Match Documentation"}</button>
                 {startMatchDocumentationButtonIsClicked && <div> 
-                        <form onSubmit={handleSubmit}>
-                            <div>
-                            <h2>{teamData.teamName}</h2>
-                            <label htmlFor="li">Playing with Libero?</label>
-                            <input type = "checkbox" onChange={() => setYourTeam(prev =>{
+                        <form className="md-form" onSubmit={handleSubmit}>
+                            <div className="md-form-section">
+                            <h2 className="md-form-title">{teamData.teamName}</h2>
+                            <label className="md-label" htmlFor="li">Playing with Libero?</label>
+                            <input className="md-input-checkbox" type = "checkbox" onChange={() => setYourTeam(prev =>{
                                return {
                                 ...prev,
                                     playingWithLibero: !prev.playingWithLibero,
@@ -231,36 +237,43 @@ export const MatchDocumentation = () => {
                             {
                                 yourTeam.playingWithLibero ? positionsLibero.map((val, index) => {
                                     return(
-                                        <div key={index}>
-                                            <p>{val}</p>
-                                            <input type="text" placeholder={val} onChange={(e) => handleChange(e, val, setTeam2)}/>
+                                        <div className="md-position-container" key={index}>
+                                            <p className="md-position-label">{val}</p>
+                                            <input className="md-input-text" type="text" placeholder={val} onChange={(e) => handleChange(e, val, setYourTeam)}/>
                                             </div>
                                     )
                                 }) : positions.map((val, index) => {
                                     return(
-                                        <div key={index}>
-                                            <p>{val}</p>
-                                            <input type="text" placeholder={val} onChange={(e) => handleChange(e, val, setTeam2)}/>
+                                        <div className="md-position-container" key={index}>
+                                            <p className="md-position-label">{val}</p>
+                                            <input className="md-input-text" type="text" placeholder={val} onChange={(e) => handleChange(e, val, setYourTeam)}/>
                                             </div>
                                     )
                                 }) 
                             } 
-                            <label htmlFor="nOfbenchPlayers">Number of Bench Players</label>
-                            <input type="number" placeholder="0" id="nOfbenchPlayers" value={yourTeam.numberOfBenchPlayers} onChange={ e => setYourTeam((prev) => {
+                            <label className="md-label" htmlFor="nOfbenchPlayers">Number of Bench Players</label>
+                            <input className="md-input-number" type="number" placeholder="0" id="nOfbenchPlayers" value={yourTeam.numberOfBenchPlayers} onChange={ e => setYourTeam((prev) => {
+                                if(e.target.value < 0){
+                                    return{
+                                        ...prev,
+                                        numberOfBenchPlayers: 0,
+                                    }
+                                }
                                 return{
                                     ...prev,
-                                    numberOfBenchPlayers: e.target.value,
+                                    numberOfBenchPlayers: parseInt(e.target.value) || 0,
                                     
                                 }
                             })}/>
                                 <div>
-                                    <h2>Bench Players</h2>
+                                    <h2 className="md-bench-title">Bench Players</h2>
                                     {
                                         [...Array(yourTeam.numberOfBenchPlayers)].map((_, i) => {
+                                            return (
                                             <div key={i}>
-                                                <input type="text" placeholder={"Bench Player Nr. " + i} value={yourTeam.benchPlayers[i]} onChange={e => {
+                                                <input className="md-input-text" type="text" placeholder={"Bench Player Nr. " + i} value={yourTeam.benchPlayers[i] || ""} onChange={e => {
                                                     setYourTeam((prev) => {
-                                                      let bPlayers = prev.benchPlayers
+                                                      let bPlayers = [...prev.benchPlayers]
                                                         bPlayers[i] = e.target.value
                                                         return{
                                                             ...prev,
@@ -270,21 +283,22 @@ export const MatchDocumentation = () => {
                                                     })
                                                 }}/>
                                             </div>
+                                            )
                                         })
                                     }
                                 </div>
                             </div>
                             </div>
-                            <div>
-                            <input type="text" placeholder="Team 2" value={team2.name} onChange={(e) => setTeam2((prev) =>{
+                            <div className="md-form-section">
+                            <input className="md-input-text" type="text" placeholder="Team 2" value={team2.name} onChange={(e) => setTeam2((prev) =>{
                                 return{
                                 ...prev,
                                 name: e.target.value,
                                 
                                 }
                                 }           )}/>
-                            <label htmlFor="li">Playing with Libero?</label>
-                            <input type = "checkbox" onChange={() => setTeam2(prev =>{
+                            <label className="md-label" htmlFor="li">Playing with Libero?</label>
+                            <input className="md-input-checkbox" type = "checkbox" onChange={() => setTeam2(prev =>{
                                return {
                                 ...prev,
                                     playingWithLibero: !prev.playingWithLibero,
@@ -294,36 +308,43 @@ export const MatchDocumentation = () => {
                             {
                                 team2.playingWithLibero ? positionsLibero.map((val, index) => {
                                     return(
-                                        <div key={index}>
-                                            <p>{val}</p>
-                                            <input type="text" placeholder={val} onChange={(e) => handleChange(e, val, setTeam2)}/>
+                                        <div className="md-position-container" key={index}>
+                                            <p className="md-position-label">{val}</p>
+                                            <input className="md-input-text" type="text" placeholder={val} onChange={(e) => handleChange(e, val, setTeam2)}/>
                                             </div>
                                     )
                                 }) : positions.map((val, index) => {
                                     return(
-                                        <div key={index}>
-                                            <p>{val}</p>
-                                            <input type="text" placeholder={val} onChange={(e) => handleChange(e, val, setTeam2)}/>
+                                        <div className="md-position-container" key={index}>
+                                            <p className="md-position-label">{val}</p>
+                                            <input className="md-input-text" type="text" placeholder={val} onChange={(e) => handleChange(e, val, setTeam2)}/>
                                             </div>
                                     )
                                 }) 
                             } 
-                            <label htmlFor="nOfbenchPlayers">Number of Bench Players</label>
-                            <input type="number" placeholder="0" id="nOfbenchPlayers" value={team2.numberOfBenchPlayers} onChange={e => setTeam2((prev) => {
+                            <label className="md-label" htmlFor="nOfbenchPlayers">Number of Bench Players</label>
+                            <input className="md-input-number" type="number" placeholder="0" id="nOfbenchPlayers" value={team2.numberOfBenchPlayers} onChange={e => setTeam2((prev) => {
+                                if(e.target.value < 0){
+                                    return{
+                                        ...prev,
+                                        numberOfBenchPlayers: 0,
+                                    }
+                                }
                                 return{
                                     ...prev,
-                                    numberOfBenchPlayers: e.target.value,
+                                    numberOfBenchPlayers: parseInt(e.target.value) || 0,
                                     
                                 }
                             })}/>
                                 <div>
-                                    <h2>Bench Players</h2>
+                                    <h2 className="md-bench-title">Bench Players</h2>
                                     {
                                         [...Array(team2.numberOfBenchPlayers)].map((_, i) => {
+                                            return (
                                             <div key={i}>
-                                                <input type="text" placeholder={"Bench Player Nr. " + i} value={team2.benchPlayers[i]} onChange={e => {
+                                                <input className="md-input-text" type="text" placeholder={"Bench Player Nr. " + i} value={team2.benchPlayers[i] || ""} onChange={e => {
                                                     setTeam2((prev) => {
-                                                      let bPlayers = prev.benchPlayers
+                                                      let bPlayers = [...prev.benchPlayers]
                                                         bPlayers[i] = e.target.value
                                                         return{
                                                             ...prev,
@@ -333,6 +354,7 @@ export const MatchDocumentation = () => {
                                                     })
                                                 }}/>
                                             </div>
+                                            )
                                         })
                                     }
                                 </div>
@@ -340,25 +362,49 @@ export const MatchDocumentation = () => {
                             </div>
                             
                             </div>
-                            <p>Number of Sets:</p>
-                           <input type="number" value={numberOfSets} onChange={(e) => setNumberOfSets(e.target.value)} placeholder="3"/>
+                            <p className="md-position-label">Number of Sets:</p>
+                           <input className="md-input-number" type="number" value={numberOfSets} onChange={(e) => setNumberOfSets(parseInt(e.target.value) || 3)} placeholder="3"/>
+                           <div>
+                            <p className="md-position-label">Who has the Starting Serve?</p>
+                            <input className="md-input-radio" type="radio" name="serve" value="team1" onChange={(e) => setYourTeam((prev) => {
+                                return{
+                                    ...prev,
+                                    isCurrentlyServing: !prev.isCurrentlyServing,
+                                }
+                                })}/>
+                            <label className="md-label" htmlFor="team1">Team 1</label>
+                            <input className="md-input-radio" type="radio" name="serve" value="team2" onChange={(e) => setTeam2((prev) => {
+                                return{
+                                    ...prev,
+                                    isCurrentlyServing: !prev.isCurrentlyServing,
+                                }
+                                })}/>
+                            <label className="md-label" htmlFor="team2">Team 2</label>
+                           </div>
+                           <div>
+                           <input className="md-input-submit" type="submit" onSubmit={handleSubmit} value="Start Match"/> 
+                           </div>
 
-                           <input type="submit" onSubmit={handleSubmit}/> 
                         </form>
                     </div>}
             </div>
-        </div> : <div>
-            <div>
-                <h2>{matchData.team1.name}</h2>
-                <div>
-                    <h2>{matchData.team1.score}</h2>
-                    <input type="button" value="+" onClick={(e) => increaseScore(e, matchData.team1)}/>
-                    <input type="button" value="-" onClick={(e) => decreaseScore(e, matchData.team1)}/>
-                    <div>
-                        <h4>{matchData.team1.wonSets}</h4>
+        </div> : 
+        
+        <div>
+        { !matchData.wonStatus ?
+        
+        <div className="md-volleyball-court">
+            <div className="md-team-court md-team-court-1">
+                <h2 className="md-team-name">{matchData.team1.name}</h2>
+                <div className="md-score-display">
+                    <h2 className="md-score-number">{matchData.team1.score}</h2>
+                    <input type="button" className="md-score-btn md-score-btn-plus" value="+" onClick={(e) => increaseScore(e, matchData.team1)}/>
+                    <input type="button" className="md-score-btn md-score-btn-minus" value="-" onClick={(e) => decreaseScore(e, matchData.team1)}/>
+                    <div className="md-sets-won-container">
+                        <h4 className="md-sets-won">{matchData.team1.wonSets}</h4>
                     </div>
                 </div>
-                <div style={{
+                <div className="md-player-positioning-grid" style={{
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr 1fr",
                     gridTemplateRows: "1fr 1fr",
@@ -381,30 +427,30 @@ export const MatchDocumentation = () => {
                                 X = "2"; Y = "2"; break;
 }
                         return (
-                                <div style={{
+                                <div key={index} className="md-player-position" style={{
                                     gridColumn: X,
                                     gridRow: Y,
                                     placeItems: "center",
                                 }}>
-                                <h2>{val.name}</h2>
-                                <p>{val.position.type}</p>
+                                <h2 className="md-player-name">{val.name}</h2>
+                                <p className="md-player-position-type">{val.position.type}</p>
                                 </div>
                         )
                     })}
                 </div>
             </div>
-            <div>
-                <h2>{matchData.team2.name}</h2>
+            <div className="md-team-court md-team-court-2">
+                <h2 className="md-team-name">{matchData.team2.name}</h2>
 
-                <div>
-                    <h2>{matchData.team2.score}</h2>
-                    <input type="button" value="+" onClick={(e) => increaseScore(e, matchData.team2)}/>
-                    <input type="button" value="-" onClick={(e) => decreaseScore(e, matchData.team2)}/>
-                    <div>
-                        <h4>{matchData.team2.wonSets}</h4>
+                <div className="md-score-display">
+                    <h2 className="md-score-number">{matchData.team2.score}</h2>
+                    <input type="button" className="md-score-btn md-score-btn-plus" value="+" onClick={(e) => increaseScore(e, matchData.team2)}/>
+                    <input type="button" className="md-score-btn md-score-btn-minus" value="-" onClick={(e) => decreaseScore(e, matchData.team2)}/>
+                    <div className="md-sets-won-container">
+                        <h4 className="md-sets-won">{matchData.team2.wonSets}</h4>
                     </div>
                 </div>
-                <div style={{
+                <div className="md-player-positioning-grid" style={{
                     display: "grid",
                     gridTemplateColumns: "1fr 1fr 1fr",
                     gridTemplateRows: "1fr 1fr",
@@ -427,25 +473,50 @@ export const MatchDocumentation = () => {
                                     X = "2"; Y = "2"; break;
 }
                         return (
-                                <div style={{
+                                <div key={index} className="md-player-position" style={{
                                     gridColumn: X,
                                     gridRow: Y,
                                     placeItems: "center",
                                 }}>
-                                <h2>{val.name}</h2>
-                                <p>{val.position.type}</p>
+                                <h2 className="md-player-name">{val.name}</h2>
+                                <p className="md-player-position-type">{val.position.type}</p>
                                 </div>
                         )
                     })}
                 </div>
             </div>
-            </div>}
-        </main>
-
-        <footer>
-
-        </footer>
-
+            </div>
+     : <div>
+        <h2>Congratulations {matchData.wonStatus.winningTeam.name}</h2>
+        <h3>Loser: {matchData.wonStatus.losingTeam.name}</h3>
+        <h3 >Set Score: <span onMouseEnter={() => setShowWonSetScore(true)} onMouseLeave={() => setShowWonSetScore(false)}>{matchData.wonStatus.wonSets}</span> - <span onMouseEnter={() => setShowLostSetScore(true)} onMouseLeave={() => setShowLostSetScore(false)}>{matchData.wonStatus.lostSets}</span></h3>
+        {showWonSetScore && <div>
+            {matchData.wonStatus.winningTeam.sets.map((val, index) => {
+                return (
+                    <div key={index}>
+                        <h3>Set {index + 1}</h3>
+                        <h4>Team 1: {val.team1Score}</h4>
+                        <h4>Team 2: {val.team2Score}</h4>
+                    </div>
+                )
+            })}
+        </div>}
+        {showLostSetScore && <div>
+            {matchData.wonStatus.losingTeam.sets.map((val, index) => {
+                return (
+                    <div key={index}>
+                        <h3>Set {index + 1}</h3>
+                        <h4>Team 1: {val.team1Score}</h4>
+                        <h4>Team 2: {val.team2Score}</h4>
+                    </div>
+                )
+            })}
+        </div>}
+    </div>}
+    </div>
+    }
+    </main>
+    </div>
         </>
     )
 }

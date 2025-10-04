@@ -1,0 +1,402 @@
+/* ===========================
+   Match Documentation Styles
+   =========================== */
+
+/* Header */
+.md-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.md-header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Main Content */
+.md-main {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+/* No Current Match Section */
+.md-no-match-title {
+    text-align: center;
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Buttons */
+.md-button,
+.md-input-button,
+.md-input-submit {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin: 0.5rem;
+}
+
+.md-button:hover,
+.md-input-button:hover,
+.md-input-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.md-button:active,
+.md-input-button:active,
+.md-input-submit:active {
+    transform: translateY(0);
+}
+
+/* Form Container */
+.md-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+}
+
+.md-form-section {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.md-form-title {
+    color: #667eea;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+}
+
+/* Form Inputs */
+.md-input-text,
+.md-input-number {
+    width: 100%;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border: 2px solid #e1e8ed;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    box-sizing: border-box;
+}
+
+.md-input-text:focus,
+.md-input-number:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Checkbox */
+.md-input-checkbox {
+    width: 20px;
+    height: 20px;
+    margin-left: 0.5rem;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+/* Radio */
+.md-input-radio {
+    margin-left: 0.5rem;
+    cursor: pointer;
+    accent-color: #667eea;
+}
+
+/* Labels */
+.md-label {
+    font-weight: 600;
+    color: #333;
+    margin-right: 0.5rem;
+    display: inline-block;
+}
+
+/* Position Inputs Container */
+.md-position-container {
+    margin-bottom: 1rem;
+}
+
+.md-position-label {
+    font-weight: 600;
+    color: #555;
+    margin: 0.5rem 0 0.25rem 0;
+}
+
+/* Bench Players Section */
+.md-bench-title {
+    margin-top: 1.5rem;
+    color: #764ba2;
+}
+
+/* Match Display (When Match is Active) */
+.md-volleyball-court {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-top: 2rem;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border: 8px solid #8B4513;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+@media (max-width: 968px) {
+    .md-volleyball-court {
+        flex-direction: column;
+    }
+}
+
+/* Team Container */
+.md-team-court {
+    background: #d4794a;
+    background: linear-gradient(135deg, #d4794a 0%, #c76940 100%);
+    padding: 2rem;
+    border: none;
+    border-radius: 0;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.1);
+    position: relative;
+    min-height: 500px;
+}
+
+.md-team-court-1 {
+    border-bottom: none;
+}
+
+.md-team-court-2 {
+    border-top: none;
+}
+
+/* Volleyball Net */
+.md-team-court-1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    right: 0;
+    height: 20px;
+    background: repeating-linear-gradient(
+        90deg,
+        #333 0px,
+        #333 2px,
+        white 2px,
+        white 12px
+    );
+    border-top: 3px solid #222;
+    border-bottom: 3px solid #222;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}
+
+/* Court Lines - Outer boundary */
+.md-team-court::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border: 4px solid rgba(255, 255, 255, 0.9);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Attack Line (3-meter line) */
+.md-player-positioning-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: rgba(255, 255, 255, 0.6);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Team Name */
+.md-team-name {
+    text-align: center;
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.4);
+    padding: 1rem;
+    border-radius: 8px;
+    position: relative;
+    z-index: 5;
+}
+
+/* Score Display */
+.md-score-display {
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    position: relative;
+    z-index: 5;
+}
+
+.md-score-number {
+    font-size: 4rem;
+    color: white;
+    margin: 0.5rem 0;
+    font-weight: 700;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+/* Score Buttons */
+.md-score-btn {
+    font-size: 1.5rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    padding: 0;
+    margin: 0 0.5rem;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    color: white;
+}
+
+.md-score-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.md-score-btn:active {
+    transform: translateY(0);
+}
+
+.md-score-btn-plus {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.md-score-btn-minus {
+    background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+}
+
+/* Won Sets Display */
+.md-sets-won-container {
+    margin-top: 1rem;
+}
+
+.md-sets-won {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 20px;
+    margin: 0;
+    font-size: 1.2rem;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.md-sets-won::before {
+    content: "Sets Won: ";
+    font-weight: 400;
+}
+
+/* Player Positioning Grid */
+.md-player-positioning-grid {
+    position: relative;
+    z-index: 5;
+    padding: 2rem 1rem;
+    margin-top: 1rem;
+}
+
+.md-player-position {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 50%;
+    text-align: center;
+    border: 4px solid white;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), inset 0 2px 8px rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 120px;
+    aspect-ratio: 1;
+    backdrop-filter: blur(10px);
+}
+
+.md-player-position:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5), inset 0 2px 12px rgba(255, 255, 255, 0.3);
+}
+
+.md-player-name {
+    margin: 0;
+    font-size: 1.1rem;
+    color: white;
+    font-weight: 700;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.md-player-position-type {
+    margin: 0.5rem 0 0 0;
+    font-size: 0.75rem;
+    opacity: 1;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Footer */
+.md-footer {
+    margin-top: 4rem;
+    padding: 2rem;
+    background: #f8f9fa;
+    text-align: center;
+    color: #666;
+}
+
+/* Utility Classes */
+.md-text-center {
+    text-align: center;
+}
+
+.md-mt-2 {
+    margin-top: 2rem;
+}
+
+.md-mb-2 {
+    margin-bottom: 2rem;
+}

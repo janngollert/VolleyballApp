@@ -54,9 +54,9 @@ type InOrOutContainer struct {
 }
 
 type Position struct {
-	Type              string `json:"type"`
-	AreTwoOnField     bool
-	ImportanceOfStats map[Stat]string
+	Type              string          `json:"type"`
+	AreTwoOnField     bool            `json:"areTwoOnField"`
+	ImportanceOfStats map[Stat]string `json:"-"`
 }
 
 type Stat struct {
@@ -78,7 +78,9 @@ type PlayingTeam struct {
 	BenchPlayers         []string `json:"benchPlayers"`
 	Score                int      `json:"score"`
 	WonSets              int      `json:"wonSets"`
-	Positioning          []Player `json:"position"`
+	Positioning          []Player `json:"positioning"`
+	IsCurrentlyServing   bool     `json:"isCurrentlyServing"`
+	MiddleIsServing      bool     `json:"middleIsServing"`
 }
 type Player struct {
 	Name     string   `json:"name"`
@@ -100,6 +102,250 @@ type WonStatus struct {
 	LosingTeam  PlayingTeam `json:"losingTeam"`
 	WonSets     int         `json:"wonSets"`
 	LostSets    int         `json:"lostSets"`
+}
+
+func (p *PlayingTeam) rotatePositions() (middleIsServing bool) {
+	p.Positioning = append(p.Positioning, p.Positioning[0])
+	p.Positioning = p.Positioning[1:]
+	if p.Positioning[3].Position.Type == "Libero" {
+		if isOnField(p.Middle1, *p) {
+			p.Positioning[3] = Player{
+				Name: p.Middle2,
+				Position: Position{
+					Type:          "Middle",
+					AreTwoOnField: true,
+				},
+			}
+
+		}
+		if isOnField(p.Middle2, *p) {
+			p.Positioning[3] = Player{
+				Name: p.Middle1,
+				Position: Position{
+					Type:          "Middle",
+					AreTwoOnField: true,
+				},
+			}
+		}
+		return true
+	}
+	return false
+}
+
+func (m *Match) setStartingPositions() {
+
+	switch m.Team1.PlayingWithLibero {
+
+	case false:
+		m.Team1.Positioning = []Player{
+			// Position 0: Setter
+			Player{
+				Name: m.Team1.Setter,
+				Position: Position{
+					Type:          "Setter",
+					AreTwoOnField: false,
+				},
+			},
+			// Position 1: Outside1
+			Player{
+				Name: m.Team1.Outside1,
+				Position: Position{
+					Type:          "Outside",
+					AreTwoOnField: true,
+				},
+			},
+			// Position 2: Middle1
+			Player{
+				Name: m.Team1.Middle1,
+				Position: Position{
+					Type:          "Middle",
+					AreTwoOnField: true,
+				},
+			},
+			// Position 3: Opposite
+			Player{
+				Name: m.Team1.Opposite,
+				Position: Position{
+					Type:          "Opposite",
+					AreTwoOnField: false,
+				},
+			},
+			// Position 4: Outside2
+			Player{
+				Name: m.Team1.Outside2,
+				Position: Position{
+					Type:          "Outside",
+					AreTwoOnField: true,
+				},
+			},
+			// Position 5: Middle2
+			Player{
+				Name: m.Team1.Middle2,
+				Position: Position{
+					Type:          "Middle",
+					AreTwoOnField: true,
+				},
+			},
+		}
+	case true:
+		m.Team1.Positioning = []Player{
+			// Position 0: Setter
+			Player{
+				Name: m.Team1.Setter,
+				Position: Position{
+					Type:          "Setter",
+					AreTwoOnField: false,
+				},
+			},
+			// Position 1: Outside1
+			Player{
+				Name: m.Team1.Outside1,
+				Position: Position{
+					Type:          "Outside",
+					AreTwoOnField: true,
+				},
+			},
+			// Position 2: Middle1
+			Player{
+				Name: m.Team1.Middle1,
+				Position: Position{
+					Type:          "Middle",
+					AreTwoOnField: true,
+				},
+			},
+			// Position 3: Opposite
+			Player{
+				Name: m.Team1.Opposite,
+				Position: Position{
+					Type:          "Opposite",
+					AreTwoOnField: false,
+				},
+			},
+			// Position 4: Outside2
+			Player{
+				Name: m.Team1.Outside2,
+				Position: Position{
+					Type:          "Outside",
+					AreTwoOnField: true,
+				},
+			},
+			// Position 5: Libero
+			Player{
+				Name: m.Team1.Libero,
+				Position: Position{
+					Type:          "Libero",
+					AreTwoOnField: false,
+				},
+			},
+		}
+	}
+
+	switch m.Team2.PlayingWithLibero {
+
+	case false:
+		m.Team2.Positioning = []Player{
+			// Position 0: Setter
+			Player{
+				Name: m.Team2.Setter,
+				Position: Position{
+					Type:          "Setter",
+					AreTwoOnField: false,
+				},
+			},
+			// Position 1: Outside1
+			Player{
+				Name: m.Team2.Outside1,
+				Position: Position{
+					Type:          "Outside",
+					AreTwoOnField: true,
+				},
+			},
+			// Position 2: Middle1
+			Player{
+				Name: m.Team2.Middle1,
+				Position: Position{
+					Type:          "Middle",
+					AreTwoOnField: true,
+				},
+			},
+			// Position 3: Opposite
+			Player{
+				Name: m.Team2.Opposite,
+				Position: Position{
+					Type:          "Opposite",
+					AreTwoOnField: false,
+				},
+			},
+			// Position 4: Outside2
+			Player{
+				Name: m.Team2.Outside2,
+				Position: Position{
+					Type:          "Outside",
+					AreTwoOnField: true,
+				},
+			},
+			// Position 5: Middle2
+			Player{
+				Name: m.Team2.Middle2,
+				Position: Position{
+					Type:          "Middle",
+					AreTwoOnField: true,
+				},
+			},
+		}
+	case true:
+		m.Team2.Positioning = []Player{
+			// Position 0: Setter
+			Player{
+				Name: m.Team2.Setter,
+				Position: Position{
+					Type:          "Setter",
+					AreTwoOnField: false,
+				},
+			},
+			// Position 1: Outside1
+			Player{
+				Name: m.Team2.Outside1,
+				Position: Position{
+					Type:          "Outside",
+					AreTwoOnField: true,
+				},
+			},
+			// Position 2: Middle1
+			Player{
+				Name: m.Team2.Middle1,
+				Position: Position{
+					Type:          "Middle",
+					AreTwoOnField: true,
+				},
+			},
+			// Position 3: Opposite
+			Player{
+				Name: m.Team2.Opposite,
+				Position: Position{
+					Type:          "Opposite",
+					AreTwoOnField: false,
+				},
+			},
+			// Position 4: Outside2
+			Player{
+				Name: m.Team2.Outside2,
+				Position: Position{
+					Type:          "Outside",
+					AreTwoOnField: true,
+				},
+			},
+			// Position 5: Libero
+			Player{
+				Name: m.Team2.Libero,
+				Position: Position{
+					Type:          "Libero",
+					AreTwoOnField: false,
+				},
+			},
+		}
+	}
+
 }
 
 func (t Team) appendPlayer(player User) {
@@ -165,11 +411,42 @@ func matchData(rw http.ResponseWriter, req *http.Request) {
 
 	case http.MethodPut:
 		var NewMatch Match
-
+		oldMatch := CurrentMatchDB[team.TeamKey]
 		err := json.NewDecoder(req.Body).Decode(&NewMatch)
 		if err != nil {
 			http.Error(rw, "DecodingError", http.StatusInternalServerError)
 		}
+
+		if oldMatch.Team1.Score < NewMatch.Team1.Score && NewMatch.Team2.IsCurrentlyServing {
+			NewMatch.Team1.MiddleIsServing = NewMatch.Team1.rotatePositions()
+			NewMatch.Team1.IsCurrentlyServing = true
+			NewMatch.Team2.IsCurrentlyServing = false
+		} else if oldMatch.Team2.Score < NewMatch.Team2.Score && NewMatch.Team1.IsCurrentlyServing {
+			NewMatch.Team2.MiddleIsServing = NewMatch.Team2.rotatePositions()
+			NewMatch.Team2.IsCurrentlyServing = true
+			NewMatch.Team1.IsCurrentlyServing = false
+		}
+		if oldMatch.Team1.MiddleIsServing && !NewMatch.Team1.IsCurrentlyServing {
+			NewMatch.Team1.MiddleIsServing = false
+			NewMatch.Team1.Positioning[0] = Player{
+				Name: NewMatch.Team1.Libero,
+				Position: Position{
+					Type:          "Libero",
+					AreTwoOnField: false,
+				},
+			}
+		}
+		if oldMatch.Team2.MiddleIsServing && !NewMatch.Team2.IsCurrentlyServing {
+			NewMatch.Team2.MiddleIsServing = false
+			NewMatch.Team2.Positioning[0] = Player{
+				Name: NewMatch.Team2.Libero,
+				Position: Position{
+					Type:          "Libero",
+					AreTwoOnField: false,
+				},
+			}
+		}
+
 		if NewMatch.Team1.Score >= 25 && NewMatch.Team1.Score-NewMatch.Team2.Score >= 2 {
 			NewMatch.Team1.WonSets = NewMatch.Team1.WonSets + 1
 			NewMatch.Sets = append(NewMatch.Sets, Set{
@@ -178,6 +455,7 @@ func matchData(rw http.ResponseWriter, req *http.Request) {
 			})
 			NewMatch.Team1.Score = 0
 			NewMatch.Team2.Score = 0
+			NewMatch.setStartingPositions()
 		} else if NewMatch.Team2.Score >= 25 && NewMatch.Team2.Score-NewMatch.Team1.Score >= 2 {
 			NewMatch.Team2.WonSets = NewMatch.Team2.WonSets + 1
 			NewMatch.Sets = append(NewMatch.Sets, Set{
@@ -186,6 +464,7 @@ func matchData(rw http.ResponseWriter, req *http.Request) {
 			})
 			NewMatch.Team1.Score = 0
 			NewMatch.Team2.Score = 0
+			NewMatch.setStartingPositions()
 		}
 		if NewMatch.Team1.WonSets >= 3 || NewMatch.Team2.WonSets >= 3 {
 			switch {
@@ -209,20 +488,29 @@ func matchData(rw http.ResponseWriter, req *http.Request) {
 
 		err := json.NewDecoder(req.Body).Decode(&NewMatch)
 		if err != nil {
+			log.Printf("Error decoding match data: %v", err)
 			http.Error(rw, "DecodingError", http.StatusInternalServerError)
+			return
 		}
-
+		NewMatch.setStartingPositions()
 		CurrentMatchDB[team.TeamKey] = NewMatch
+
+		rw.WriteHeader(http.StatusOK)
+		rw.Write([]byte("Match created successfully"))
 
 	case http.MethodGet:
 		currentMatch, ok := CurrentMatchDB[team.TeamKey]
 		if !ok {
 			http.Error(rw, "No current Match", http.StatusInternalServerError)
+			return
 		}
 
+		rw.Header().Set("Content-Type", "application/json")
 		err := json.NewEncoder(rw).Encode(currentMatch)
 		if err != nil {
+			log.Printf("Error encoding match data: %v", err)
 			http.Error(rw, "Encoding Error", http.StatusInternalServerError)
+			return
 		}
 	}
 }
@@ -239,6 +527,12 @@ func handleTrainingComment(rw http.ResponseWriter, req *http.Request) {
 
 		if err != nil {
 			http.Error(rw, "Decoding in handleTrainingComment wrent wrong", http.StatusInternalServerError)
+			return
+		}
+
+		if len(trainings) == 0 || comment.Index < 0 || comment.Index >= len(trainings) {
+			http.Error(rw, "Invalid training index", http.StatusBadRequest)
+			return
 		}
 
 		currentTraining := trainings[comment.Index]
@@ -267,7 +561,14 @@ func inOrOutData(rw http.ResponseWriter, req *http.Request) {
 
 	if err != nil {
 		http.Error(rw, "Decoding went wrong", http.StatusInternalServerError)
+		return
 	}
+
+	if len(trainings) == 0 || inOrOutContainer.Index < 0 || inOrOutContainer.Index >= len(trainings) {
+		http.Error(rw, "Invalid training index", http.StatusBadRequest)
+		return
+	}
+
 	currentTraining := trainings[inOrOutContainer.Index]
 
 	currentTraining = currentTraining.appendPlayer(user, inOrOutContainer.InOrOut)
@@ -325,7 +626,9 @@ func scheduleData(rw http.ResponseWriter, req *http.Request) {
 		}
 
 		trainingDB[user.TeamKey] = newSchedule
-		team.NextTraining = newSchedule[len(newSchedule)-1]
+		if len(newSchedule) > 0 {
+			team.NextTraining = newSchedule[len(newSchedule)-1]
+		}
 		teamDB[user.TeamKey] = team
 	default:
 		http.Error(rw, "Wrong Method", http.StatusMethodNotAllowed)
@@ -455,7 +758,7 @@ func withCORS(next http.HandlerFunc) http.HandlerFunc {
 		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, OPTIONS")
 
 		if r.Method == http.MethodOptions {
 			w.WriteHeader(http.StatusOK)
@@ -488,4 +791,13 @@ func getData(rw http.ResponseWriter, req *http.Request) (user User, team Team, t
 	}
 
 	return user, team, trainings
+}
+
+func isOnField(player string, team PlayingTeam) bool {
+	for _, p := range team.Positioning {
+		if p.Name == player {
+			return true
+		}
+	}
+	return false
 }
